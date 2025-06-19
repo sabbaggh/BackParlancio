@@ -41,6 +41,15 @@ class InteresDB(Base):
 
 Base.metadata.create_all(bind=engine)
 
+class ConversacionFront(Base):
+    __tablename__ = "conversaciones_front"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(200), nullable=False)
+    language = Column(String(10), nullable=False)
+    level = Column(String(50), nullable=False)
+    image = Column(String(500), nullable=True)
+
 def get_db():
     db = SessionLocal()
     try:
@@ -70,6 +79,13 @@ class UsuarioRegistro(BaseModel):
     language: str
     interests: List[str]
 
+class ConvoFront(BaseModel):
+    id: int
+    title: str
+    language: str
+    level: str
+    image: str
+
 app = FastAPI()
 
 @app.get("/")
@@ -79,6 +95,13 @@ def read_root():
 @app.post("/users/validate-mail")
 def saludar(usuario: Usuario):
     return {"mensaje": f"Hola, {usuario.mail}!"}
+
+@app.get("/convos/get-front")
+def getConvos(language: str, db: Session = Depends(get_db)):
+    resultados = db.query(ConversacionFront).filter(ConversacionFront.language == language.lower()).all()
+    if not resultados:
+        raise HTTPException(status_code=404, detail="No se encontraron conversaciones para ese idioma")
+    return resultados
 
 @app.post("/users/sign-up")
 def registrar(usuario: UsuarioRegistro, db: Session = Depends(get_db)):
