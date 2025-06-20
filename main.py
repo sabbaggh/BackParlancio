@@ -1,11 +1,11 @@
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, ForeignKey, JSON
 from sqlalchemy.orm import relationship, sessionmaker, declarative_base
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Any
 from fastapi import Depends, HTTPException
 
-DATABASE_URL = "mysql+pymysql://root:1234@localhost/parlancio"
+DATABASE_URL = "mysql+pymysql://root:juanin+3@localhost/parlancio"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
 Base = declarative_base()
@@ -50,6 +50,13 @@ class ConversacionFront(Base):
     level = Column(String(50), nullable=False)
     image = Column(String(500), nullable=True)
 
+class ConversacionContent(Base):
+    __tablename__ = "conversaciones_content"
+
+    id = Column(Integer, primary_key=True, index=True)
+    id_conversaciones_front = Column(Integer, nullable=False)
+    content = Column(JSON, nullable=False)
+
 def get_db():
     db = SessionLocal()
     try:
@@ -86,6 +93,11 @@ class ConvoFront(BaseModel):
     level: str
     image: str
 
+class ConvoContent(BaseModel):
+    id: int
+    id_conversacion_front: str
+    content: Any
+
 app = FastAPI()
 
 @app.get("/")
@@ -102,6 +114,13 @@ def getConvos(language: str, db: Session = Depends(get_db)):
     if not resultados:
         raise HTTPException(status_code=404, detail="No se encontraron conversaciones para ese idioma")
     return resultados
+
+@app.get("/convos/get-conversation")
+def getConvos(id_conversaciones_front: int, db: Session = Depends(get_db)):
+    resultados = db.query(ConversacionContent).filter(ConversacionContent.id_conversaciones_front == id_conversaciones_front).all()
+    if not resultados:
+        raise HTTPException(status_code=404, detail="No se encontro la conversacion")
+    return resultados[0].content
 
 @app.post("/users/sign-up")
 def registrar(usuario: UsuarioRegistro, db: Session = Depends(get_db)):
