@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from typing import List, Any
 from fastapi import Depends, HTTPException
 
-DATABASE_URL = "mysql+pymysql://root:juanin+3@localhost/parlancio"
+DATABASE_URL = "mysql+pymysql://root:1234@localhost/parlancio"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
 Base = declarative_base()
@@ -98,6 +98,10 @@ class ConvoContent(BaseModel):
     id_conversacion_front: str
     content: Any
 
+class UsuarioLogin(BaseModel):
+    mail: str
+    password: str
+
 app = FastAPI()
 
 @app.get("/")
@@ -107,6 +111,13 @@ def read_root():
 @app.post("/users/validate-mail")
 def saludar(usuario: Usuario):
     return {"mensaje": f"Hola, {usuario.mail}!"}
+
+@app.post("/users/login")
+def login(usuario: UsuarioLogin, db: Session = Depends(get_db)):
+    existente = db.query(UsuarioDB).filter(UsuarioDB.mail == usuario.mail, UsuarioDB.password == usuario.password).first()
+    if not existente:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return existente
 
 @app.get("/convos/get-front")
 def getConvos(language: str, db: Session = Depends(get_db)):
