@@ -1,11 +1,29 @@
 from sqlalchemy import create_engine, Column, Integer, String, Boolean, ForeignKey, JSON
 from sqlalchemy.orm import relationship, sessionmaker, declarative_base
-from sqlalchemy import text
 from sqlalchemy.orm import Session
 from typing import List, Any
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, UploadFile, File, Form
+import os
+import azure.cognitiveservices.speech as speechsdk
+from pydub import AudioSegment
+from dotenv import load_dotenv
+from openai import OpenAI
 
-DATABASE_URL = "mysql+pymysql://root:1234@localhost/parlancio"
+load_dotenv()
+SPEECH_KEY = os.getenv("SPEECH_KEY")
+SPEECH_REGION = os.getenv("SPEECH_REGION")
+
+USER = os.getenv("USER_DATABASE")
+PASSWORD = os.getenv("PASSWORD_DATABASE")
+ADDRESS = os.getenv("ADDRESS_DATABASE")
+SCHEMA = os.getenv("SCHEMA_DATABASE")
+
+client = OpenAI(
+    # This is the default and can be omitted
+    api_key=os.getenv("OPENAI_API_KEY"),
+)
+
+DATABASE_URL = f"mysql+pymysql://root:1234@localhost:3306/parlancio"
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine)
 Base = declarative_base()
@@ -57,6 +75,25 @@ class ConversacionContent(Base):
     id_conversaciones_front = Column(Integer, nullable=False)
     content = Column(JSON, nullable=False)
 
+class ViewUsersInterests(Base):
+    __tablename__ = "vw_users_interests"
+
+    id = Column(Integer, primary_key=True, index=True)
+    mail = Column(String)
+    password = Column(String)
+    level = Column(String)
+    corrections = Column(String)
+    language = Column(String)
+    videojuegos = Column(Boolean)
+    peliculas = Column(Boolean)
+    series = Column(Boolean)
+    moda = Column(Boolean)
+    travel = Column(Boolean)
+    anime = Column(Boolean)
+    ai = Column(Boolean)
+    tecnologia = Column(Boolean)
+
+
 def get_db():
     db = SessionLocal()
     try:
@@ -102,6 +139,11 @@ class UsuarioLogin(BaseModel):
     mail: str
     password: str
 
+class ConversationEval(BaseModel):
+    message: str
+    language: str
+    audio: str
+
 app = FastAPI()
 
 @app.get("/")
@@ -114,7 +156,7 @@ def saludar(usuario: Usuario):
 
 @app.post("/users/login")
 def login(usuario: UsuarioLogin, db: Session = Depends(get_db)):
-    existente = db.query(UsuarioDB).filter(UsuarioDB.mail == usuario.mail, UsuarioDB.password == usuario.password).first()
+    existente = db.query(ViewUsersInterests).filter(ViewUsersInterests.mail == usuario.mail, ViewUsersInterests.password == usuario.password).first()
     if not existente:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     return existente
@@ -154,17 +196,159 @@ def registrar(usuario: UsuarioRegistro, db: Session = Depends(get_db)):
     # Crear intereses
     intereses_usuario = InteresDB(
         usuario_id=nuevo_usuario.id,
-        videojuegos="Videojuegos" in usuario.interests,
-        peliculas="Peliculas" in usuario.interests,
+        videojuegos="videojuegos" in usuario.interests,
+        peliculas="peliculas" in usuario.interests,
         series=False,  # Puedes ajustar si quieres
-        moda="Moda" in usuario.interests,
-        travel="Viajes" in usuario.interests,
-        anime="Anime" in usuario.interests,
-        ai="AI" in usuario.interests,
-        tecnologia="Tecnologia" in usuario.interests,
+        moda="moda" in usuario.interests,
+        travel="viajes" in usuario.interests,
+        anime="anime" in usuario.interests,
+        ai="ai" in usuario.interests,
+        tecnologia="tecnologia" in usuario.interests,
     )
     db.add(intereses_usuario)
     db.commit()
     db.refresh(nuevo_usuario)
+    existente = db.query(ViewUsersInterests).filter(ViewUsersInterests.mail == usuario.mail, ViewUsersInterests.password == usuario.password).first()
+    if not existente:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return existente
 
-    return {"mensaje": f"Usuario {nuevo_usuario.mail} registrado exitosamente"}
+    #return {"mensaje": f"Usuario {nuevo_usuario.mail} registrado exitosamente"}
+
+
+@app.post("/convos/evaluate")
+async def evaluate_pronunciation(
+    file: UploadFile = File(...),
+    reference_text: str = Form(...),
+    language: str = Form("zh-CN")  # Valor por defecto
+):
+    try:
+        # Validar formato de audio
+        """if not file.filename.endswith(('.wav', '.mp3')):
+            raise HTTPException(400, "Formato no soportado. Use WAV o MP3")"""
+
+        # Guardar temporalmente
+        temp_path = f"temp_{file.filename}"
+        with open(temp_path, "wb") as buffer:
+            content = await file.read()
+            buffer.write(content)
+        
+        
+        try:
+            sound = AudioSegment.from_file(temp_path, format='m4a')
+            output_path = "converted_audio.wav"
+            
+            # Exportar el archivo convertido
+            sound.export(output_path, format='wav')
+            
+            print(f"Archivo original: {temp_path}")
+            print(f"Tipo de contenido: {file.content_type}")
+            print(f"Tamaño original: {len(content)} bytes")
+            
+            # 3. Opcional: eliminar el archivo temporal
+            os.remove(temp_path)
+            
+            # Configurar Azure
+            print(SPEECH_KEY)
+            print(SPEECH_REGION)
+            speech_config = speechsdk.SpeechConfig(subscription=SPEECH_KEY, region=SPEECH_REGION)
+            speech_config.speech_recognition_language = language
+            audio_config = speechsdk.audio.AudioConfig(filename=output_path)
+            
+            pronunciation_config = speechsdk.PronunciationAssessmentConfig(
+                reference_text=reference_text,
+                grading_system=speechsdk.PronunciationAssessmentGradingSystem.HundredMark,
+                granularity=speechsdk.PronunciationAssessmentGranularity.Phoneme,
+                enable_miscue=True
+            )
+
+            recognizer = speechsdk.SpeechRecognizer(speech_config, audio_config)
+            pronunciation_config.apply_to(recognizer)
+
+            result = recognizer.recognize_once()
+
+            if result.reason == speechsdk.ResultReason.RecognizedSpeech:
+                pronunciation_result = speechsdk.PronunciationAssessmentResult(result)
+                # Resultados generales
+                general_scores = {
+                    "accuracy_score": pronunciation_result.accuracy_score,
+                    "fluency_score": pronunciation_result.fluency_score,
+                    "completeness_score": pronunciation_result.completeness_score,
+                    "pronunciation_score": pronunciation_result.pronunciation_score
+                }
+                #print(pronunciation_result)
+                # Resultados por palabra
+                word_results = []
+                for word in pronunciation_result.words:
+                    word_results.append({
+                        "word": word.word,
+                        "accuracy_score": word.accuracy_score,
+                        "error_type": word.error_type if word.error_type else None,
+                    })
+                
+                return {
+                    "general_scores": general_scores,
+                    "word_results": word_results
+                }
+            else:
+                raise HTTPException(400, "No se pudo evaluar el audio")
+            
+        except Exception as conv_error:
+            # Asegurarse de eliminar el archivo temporal incluso si hay error
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Error al convertir el audio: {str(conv_error)}"
+            )
+
+        
+
+    except Exception as e:
+        if 'temp_path' in locals() and os.path.exists(temp_path):
+            os.remove(temp_path)
+        raise HTTPException(500, str(e))
+    
+@app.post("/convos/create-convo")
+async def evaluate_pronunciation(usuario: UsuarioRegistro):
+    lenguaje = "chino"
+    if usuario.language == "en":
+        lenguaje = "ingles"
+    elif usuario.language == "pt":
+        lenguaje = "portugues"
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",  # You can also use "gpt-3.5-turbo"
+        messages=[
+            {"role": "system", "content": f"""Crea una conversacion en el idioma {lenguaje} tomando en cuenta que el usuario esta interesado en {", ".join([x for x in usuario.interests])}, por lo tanto debes crear una conversacion relacionada con alguno de esos temas, el usuario es {usuario.level} en el lenguaje la conversacion tiene que llevar el siguiente formato y con al menos 10 mensajes en la conversacion: [
+  {{
+    "role": "服务员",
+    "agent_type": "system",
+    "message": "你好，欢迎光临！请问你要点什么？",
+    "state": "done"
+  }},
+  {{
+    "role": "顾客",
+    "agent_type": "user",
+    "message": "你好，我想要一杯咖啡。",
+    "state": "wait"
+  }},
+  {{
+    "role": "服务员",
+    "agent_type": "system",
+    "message": "好的，请问你要热的还是冰的？",
+    "state": "hide"
+  }},
+  {{
+    "role": "顾客",
+    "agent_type": "user",
+    "message": "我要热的，谢谢。",
+    "state": "hide"
+  }}
+]
+Siempre debe empezar el system y luego va el user y asi sucesivamente, el primer estado debe ser done en el system y wait en el user, no le cambies el nombre a los estados que se usan, siempre son done, wait y hide, y para los aget_type solo son system y user, el role lo puedes cambiar de acuerdo a la tematica de la conversacion y el lenguaje. Finalmente solo regresa el json y no digas nada mas"""},
+            {"role": "user", "content": "Genera la conversacion, solo regresa el json"}
+        ]
+    )
+
+    print(response.choices[0].message.content)
+    return(response.choices[0].message.content)

@@ -245,3 +245,428 @@ INSERT INTO conversaciones_content (id_conversaciones_front, content) VALUES
     "state": "hide"
   }
 ]');
+
+INSERT INTO conversaciones_content (id_conversaciones_front, content) VALUES
+(6, '[
+  {
+    "role": "Waiter",
+    "agent_type": "system",
+    "message": "Hello, welcome! What would you like to order?",
+    "state": "done"
+  },
+  {
+    "role": "Customer",
+    "agent_type": "user",
+    "message": "Hi, I''d like a coffee please.",
+    "state": "wait"
+  },
+  {
+    "role": "Waiter",
+    "agent_type": "system",
+    "message": "Certainly, would you like it hot or iced?",
+    "state": "hide"
+  },
+  {
+    "role": "Customer",
+    "agent_type": "user",
+    "message": "I''ll have it hot, thank you.",
+    "state": "hide"
+  },
+  {
+    "role": "Waiter",
+    "agent_type": "system",
+    "message": "Very well, please wait a moment.",
+    "state": "hide"
+  },
+  {
+    "role": "Customer",
+    "agent_type": "user",
+    "message": "Okay, thank you!",
+    "state": "hide"
+  }
+]'),
+(7, '[
+    {
+      "role": "Manager",
+      "agent_type": "system",
+      "message": "You''re late again? It''s already 10 o''clock.",
+      "state": "done"
+    },
+    {
+      "role": "Employee",
+      "agent_type": "user",
+      "message": "I''m sorry manager, there was a subway malfunction today and I waited for a long time.",
+      "state": "wait"
+    },
+    {
+      "role": "Manager",
+      "agent_type": "system",
+      "message": "You should leave earlier. This affects work efficiency.",
+      "state": "hide"
+    },
+    {
+      "role": "Employee",
+      "agent_type": "user",
+      "message": "I understand, I''ll leave earlier in the future to be on time.",
+      "state": "hide"
+    },
+    {
+      "role": "Manager",
+      "agent_type": "system",
+      "message": "I hope this is the last time. Go ahead and start your work now.",
+      "state": "hide"
+    },
+    {
+      "role": "Employee",
+      "agent_type": "user",
+      "message": "Okay, thank you for your understanding.",
+      "state": "hide"
+    }
+  ]'),
+(8, '[
+  {
+    "role": "Shop Assistant",
+    "agent_type": "system",
+    "message": "Hello, can I help you find something?",
+    "state": "done"
+  },
+  {
+    "role": "Customer",
+    "agent_type": "user",
+    "message": "Hi, I''m looking for sugar-free soy milk and organic oatmeal.",
+    "state": "wait"
+  },
+  {
+    "role": "Shop Assistant",
+    "agent_type": "system",
+    "message": "The sugar-free soy milk is in the third row of the beverage section. The organic oatmeal is on the left side of the grains section.",
+    "state": "hide"
+  },
+  {
+    "role": "Customer",
+    "agent_type": "user",
+    "message": "Thank you! Also, do you have a discount products section?",
+    "state": "hide"
+  },
+  {
+    "role": "Shop Assistant",
+    "agent_type": "system",
+    "message": "Yes, on the shelves next to the checkout counter - all discounted products are there.",
+    "state": "hide"
+  },
+  {
+    "role": "Customer",
+    "agent_type": "user",
+    "message": "Great, I''ll take a look. Can I use digital payment at checkout?",
+    "state": "hide"
+  },
+  {
+    "role": "Shop Assistant",
+    "agent_type": "system",
+    "message": "Of course, we accept WeChat Pay, Alipay and bank cards.",
+    "state": "hide"
+  },
+  {
+    "role": "Customer",
+    "agent_type": "user",
+    "message": "Thank you for your help, the service is excellent.",
+    "state": "hide"
+  },
+  {
+    "role": "Shop Assistant",
+    "agent_type": "system",
+    "message": "You''re welcome, have a pleasant shopping experience!",
+    "state": "hide"
+  }
+]'),
+(9, '[
+  {
+    "role": "Teacher",
+    "agent_type": "system",
+    "message": "Hello everyone, welcome to Chinese class! I''m your teacher.",
+    "state": "done"
+  },
+  {
+    "role": "Student",
+    "agent_type": "user",
+    "message": "Hello teacher! I''m a new student.",
+    "state": "wait"
+  },
+  {
+    "role": "Teacher",
+    "agent_type": "system",
+    "message": "Hello! May I know your name?",
+    "state": "hide"
+  },
+  {
+    "role": "Student",
+    "agent_type": "user",
+    "message": "My name is Martin. Nice to meet everyone!",
+    "state": "hide"
+  },
+  {
+    "role": "Teacher",
+    "agent_type": "system",
+    "message": "Welcome Martin. Please take a seat, we''ll start the class shortly.",
+    "state": "hide"
+  },
+  {
+    "role": "Student",
+    "agent_type": "user",
+    "message": "Okay, thank you teacher.",
+    "state": "hide"
+  }
+]'),
+(10, '[
+  {
+    "role": "Colleague A",
+    "agent_type": "system",
+    "message": "Hello, today is your first day at work, right? Welcome to our team!",
+    "state": "done"
+  },
+  {
+    "role": "New Colleague",
+    "agent_type": "user",
+    "message": "Hello, thank you! My name is Li Na, pleased to meet everyone.",
+    "state": "wait"
+  },
+  {
+    "role": "Colleague A",
+    "agent_type": "system",
+    "message": "I''m Wang Ming, I work in the marketing department. If you have any questions, feel free to ask me.",
+    "state": "hide"
+  },
+  {
+    "role": "New Colleague",
+    "agent_type": "user",
+    "message": "That''s great, thank you for your help! The atmosphere here is very nice.",
+    "state": "hide"
+  },
+  {
+    "role": "Colleague A",
+    "agent_type": "system",
+    "message": "Yes, our team is very friendly. Would you like to have lunch together?",
+    "state": "hide"
+  },
+  {
+    "role": "New Colleague",
+    "agent_type": "user",
+    "message": "Sure, I''d love to join you.",
+    "state": "hide"
+  }
+]');
+
+INSERT INTO conversaciones_content (id_conversaciones_front, content) VALUES
+(11, '[
+  {
+    "role": "Garçom",
+    "agent_type": "system",
+    "message": "Olá, bem-vindo! O que você gostaria de pedir?",
+    "state": "done"
+  },
+  {
+    "role": "Cliente",
+    "agent_type": "user",
+    "message": "Oi, eu gostaria de um café, por favor.",
+    "state": "wait"
+  },
+  {
+    "role": "Garçom",
+    "agent_type": "system",
+    "message": "Claro, você quer quente ou gelado?",
+    "state": "hide"
+  },
+  {
+    "role": "Cliente",
+    "agent_type": "user",
+    "message": "Quero quente, obrigado.",
+    "state": "hide"
+  },
+  {
+    "role": "Garçom",
+    "agent_type": "system",
+    "message": "Certo, aguarde um momento.",
+    "state": "hide"
+  },
+  {
+    "role": "Cliente",
+    "agent_type": "user",
+    "message": "Ok, obrigado!",
+    "state": "hide"
+  }
+]'),
+(12, '[
+    {
+      "role": "Gerente",
+      "agent_type": "system",
+      "message": "Você está atrasado de novo? Já são 10 horas.",
+      "state": "done"
+    },
+    {
+      "role": "Funcionário",
+      "agent_type": "user",
+      "message": "Desculpe, gerente, hoje teve um problema no metrô e eu fiquei esperando muito tempo.",
+      "state": "wait"
+    },
+    {
+      "role": "Gerente",
+      "agent_type": "system",
+      "message": "Você deveria sair mais cedo. Isso afeta a produtividade.",
+      "state": "hide"
+    },
+    {
+      "role": "Funcionário",
+      "agent_type": "user",
+      "message": "Eu entendo, vou sair mais cedo no futuro para chegar no horário.",
+      "state": "hide"
+    },
+    {
+      "role": "Gerente",
+      "agent_type": "system",
+      "message": "Espero que seja a última vez. Vá começar seu trabalho agora.",
+      "state": "hide"
+    },
+    {
+      "role": "Funcionário",
+      "agent_type": "user",
+      "message": "Certo, obrigado pela compreensão.",
+      "state": "hide"
+    }
+  ]'),
+(13, '[
+  {
+    "role": "Atendente",
+    "agent_type": "system",
+    "message": "Olá, posso ajudar a encontrar algo?",
+    "state": "done"
+  },
+  {
+    "role": "Cliente",
+    "agent_type": "user",
+    "message": "Oi, estou procurando leite de soja sem açúcar e aveia orgânica.",
+    "state": "wait"
+  },
+  {
+    "role": "Atendente",
+    "agent_type": "system",
+    "message": "O leite de soja sem açúcar está na terceira prateleira da seção de bebidas. A aveia orgânica fica no lado esquerdo da seção de grãos.",
+    "state": "hide"
+  },
+  {
+    "role": "Cliente",
+    "agent_type": "user",
+    "message": "Obrigado! A propósito, vocês têm uma seção de produtos em promoção?",
+    "state": "hide"
+  },
+  {
+    "role": "Atendente",
+    "agent_type": "system",
+    "message": "Temos sim, nas prateleiras perto do caixa - todos os produtos em promoção estão lá.",
+    "state": "hide"
+  },
+  {
+    "role": "Cliente",
+    "agent_type": "user",
+    "message": "Ótimo, vou dar uma olhada. Posso pagar com pix no caixa?",
+    "state": "hide"
+  },
+  {
+    "role": "Atendente",
+    "agent_type": "system",
+    "message": "Claro, aceitamos Pix, cartões e dinheiro.",
+    "state": "hide"
+  },
+  {
+    "role": "Cliente",
+    "agent_type": "user",
+    "message": "Obrigado pela ajuda, o atendimento foi excelente.",
+    "state": "hide"
+  },
+  {
+    "role": "Atendente",
+    "agent_type": "system",
+    "message": "De nada, boas compras!",
+    "state": "hide"
+  }
+]'),
+(14, '[
+  {
+    "role": "Professor",
+    "agent_type": "system",
+    "message": "Olá a todos, bem-vindos à aula de português! Eu sou seu professor.",
+    "state": "done"
+  },
+  {
+    "role": "Aluno",
+    "agent_type": "user",
+    "message": "Bom dia, professor! Eu sou novo aqui.",
+    "state": "wait"
+  },
+  {
+    "role": "Professor",
+    "agent_type": "system",
+    "message": "Olá! Qual é o seu nome?",
+    "state": "hide"
+  },
+  {
+    "role": "Aluno",
+    "agent_type": "user",
+    "message": "Meu nome é João. Prazer em conhecer todos!",
+    "state": "hide"
+  },
+  {
+    "role": "Professor",
+    "agent_type": "system",
+    "message": "Bem-vindo, João. Por favor, sente-se, vamos começar a aula em breve.",
+    "state": "hide"
+  },
+  {
+    "role": "Aluno",
+    "agent_type": "user",
+    "message": "Certo, obrigado professor.",
+    "state": "hide"
+  }
+]'),
+(15, '[
+  {
+    "role": "Colega A",
+    "agent_type": "system",
+    "message": "Olá, hoje é seu primeiro dia de trabalho, não é? Bem-vinda ao nosso time!",
+    "state": "done"
+  },
+  {
+    "role": "Nova Colega",
+    "agent_type": "user",
+    "message": "Oi, obrigada! Meu nome é Ana, prazer em conhecer todos.",
+    "state": "wait"
+  },
+  {
+    "role": "Colega A",
+    "agent_type": "system",
+    "message": "Eu sou o Carlos, trabalho no departamento de marketing. Se tiver alguma dúvida, pode me perguntar.",
+    "state": "hide"
+  },
+  {
+    "role": "Nova Colega",
+    "agent_type": "user",
+    "message": "Que ótimo, obrigada pela ajuda! O clima aqui parece muito bom.",
+    "state": "hide"
+  },
+  {
+    "role": "Colega A",
+    "agent_type": "system",
+    "message": "Sim, nosso time é muito unido. Quer almoçar junto hoje?",
+    "state": "hide"
+  },
+  {
+    "role": "Nova Colega",
+    "agent_type": "user",
+    "message": "Adoraria, com certeza!",
+    "state": "hide"
+  }
+]');
+
+
+CREATE VIEW vw_users_interests
+AS select u.*, s.videojuegos, s.peliculas, s.series, s.moda, s.travel, s.anime, s.ai, s.tecnologia from usuarios u 
+join intereses s on u.id = s.usuario_id;
